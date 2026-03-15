@@ -41,3 +41,8 @@ def partners_page(request: Request):
 @app.get("/kontakt")
 def contact_page(request: Request):
     return templates.TemplateResponse("kontakt.html", {"request": request})
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
