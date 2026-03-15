@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bron Qilish</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav>
+  <a href="/" style="text-decoration:none"><img src="/static/images/logo.svg" alt="MiniPolya" height="36"></a>
+  <div class="nav-links"><a href="/">← Orqaga</a></div>
+</nav>
+
+<div class="booking-wrap">
+  <h2 id="field-title">Yuklanmoqda...</h2>
+  <p class="sub" id="field-price"></p>
+
+  <div id="success-msg" class="success-box" style="display:none">
+    <h3>🎉 Bron Tasdiqlandi!</h3>
+    <p id="success-detail"></p>
+    <a href="/" class="btn-bron" style="display:inline-block;margin-top:12px;text-decoration:none">← Bosh sahifaga</a>
+  </div>
+
+  <div id="booking-form">
+    <div class="form-group">
+      <label>ISMINGIZ</label>
+      <input type="text" id="inp-name" placeholder="Akbar Toshmatov">
+    </div>
+    <div class="form-group">
+      <label>TELEFON</label>
+      <input type="text" id="inp-phone" placeholder="+998901234567">
+    </div>
+    <div class="form-group">
+      <label>SANA</label>
+      <input type="date" id="inp-date">
+    </div>
+    <div class="form-group">
+      <label>BOSHLANISH VAQTI</label>
+      <select id="inp-start">
+        <option value="">-- Tanlang --</option>
+        <option>08:00</option><option>09:00</option><option>10:00</option>
+        <option>11:00</option><option>12:00</option><option>13:00</option>
+        <option>14:00</option><option>15:00</option><option>16:00</option>
+        <option>17:00</option><option>18:00</option><option>19:00</option>
+        <option>20:00</option><option>21:00</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>TUGASH VAQTI</label>
+      <select id="inp-end">
+        <option value="">-- Tanlang --</option>
+        <option>09:00</option><option>10:00</option><option>11:00</option>
+        <option>12:00</option><option>13:00</option><option>14:00</option>
+        <option>15:00</option><option>16:00</option><option>17:00</option>
+        <option>18:00</option><option>19:00</option><option>20:00</option>
+        <option>21:00</option><option>22:00</option>
+      </select>
+    </div>
+    <div class="summary" id="summary" style="display:none">
+      <div class="sum-row"><span>Polya</span><span id="sum-field">—</span></div>
+      <div class="sum-row"><span>Vaqt</span><span id="sum-time">—</span></div>
+      <div class="sum-row total"><span>Narx</span><span id="sum-price">—</span></div>
+    </div>
+    <div id="error-msg" class="error-box" style="display:none"></div>
+    <button class="btn-bron" onclick="submitBooking()">✅ Bronni Tasdiqlash</button>
+  </div>
+</div>
+
+<script>
+const fieldId = {{ field_id }};
+let fieldData = null;
+
+async function loadField() {
+  const res = await fetch('/api/fields/' + fieldId);
+  if (!res.ok) { document.getElementById('field-title').textContent = 'Polya topilmadi'; return; }
+  fieldData = await res.json();
+  document.getElementById('field-title').textContent = fieldData.name;
+  document.getElementById('field-price').textContent = fieldData.price_per_hour.toLocaleString() + ' so\'m / soat';
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('inp-date').value = today;
+}
+
+function updateSummary() {
+  const start = document.getElementById('inp-start').value;
+  const end = document.getElementById('inp-end').value;
+  const date = document.getElementById('inp-date').value;
+  if (start && end && date && fieldData) {
+    const hours = (parseInt(end) - parseInt(start));
+    if (hours > 0) {
+      document.getElementById('summary').style.display = 'block';
+      document.getElementById('sum-field').textContent = fieldData.name;
+      document.getElementById('sum-time').textContent = start + ' – ' + end;
+      document.getElementById('sum-price').textContent = (fieldData.price_per_hour * hours).toLocaleString() + ' so\'m';
+    }
+  }
+}
+
+document.getElementById('inp-start').addEventListener('change', updateSummary);
+document.getElementById('inp-end').addEventListener('change', updateSummary);
+document.getElementById('inp-date').addEventListener('change', updateSummary);
+
+async function submitBooking() {
+  const name = document.getElementById('inp-name').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
+  const date = document.getElementById('inp-date').value;
+  const start = document.getElementById('inp-start').value;
+  const end = document.getElementById('inp-end').value;
+  const errBox = document.getElementById('error-msg');
+
+  if (!name || !phone || !date || !start || !end) {
+    errBox.style.display = 'block';
+    errBox.textContent = '⚠️ Barcha maydonlarni to\'ldiring!';
+    return;
+  }
+  if (parseInt(end) <= parseInt(start)) {
+    errBox.style.display = 'block';
+    errBox.textContent = '⚠️ Tugash vaqti boshlanishdan keyin bo\'lishi kerak!';
+    return;
+  }
+  errBox.style.display = 'none';
+
+  const startDt = date + 'T' + start + ':00';
+  const endDt = date + 'T' + end + ':00';
+
+  const res = await fetch('/api/bookings/', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      field_id: fieldId,
+      user_name: name,
+      user_phone: phone,
+      start_time: startDt,
+      end_time: endDt
+    })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    document.getElementById('booking-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+    document.getElementById('success-detail').textContent =
+      fieldData.name + ' · ' + date + ' · ' + start + '–' + end + ' · Bron #' + data.id;
+  } else {
+    errBox.style.display = 'block';
+    errBox.textContent = '❌ ' + (data.detail || 'Xatolik yuz berdi');
+  }
+}
+
+loadField();
+</script>
+</body>
+</html>

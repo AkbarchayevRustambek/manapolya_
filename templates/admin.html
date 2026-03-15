@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — ManaPolya</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+<nav>
+  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:12px">
+    <img src="/static/images/logo.svg" alt="ManaPolya" height="48" style="border-radius:50%;object-fit:cover;width:48px;height:48px;border:2px solid #22C55E;">
+    <span style="font-size:1.2rem;font-weight:800;color:#f1f5f9">Mana<span style="color:#22C55E">Polya</span></span>
+  </a>
+  <div class="nav-links"><a href="/">← Saytga o'tish</a></div>
+</nav>
+
+<div class="admin-wrap">
+  <h2>⚙️ Admin Panel</h2>
+
+  <div class="stats">
+    <div class="stat"><div class="num" id="st-total">0</div><div class="lbl" data-i18n="stat_total">Jami bronlar</div></div>
+    <div class="stat"><div class="num" style="color:var(--green)" id="st-confirmed">0</div><div class="lbl" data-i18n="stat_confirmed">Tasdiqlangan</div></div>
+    <div class="stat"><div class="num" style="color:var(--red)" id="st-cancelled">0</div><div class="lbl" data-i18n="stat_cancelled">Bekor qilingan</div></div>
+  </div>
+
+  <!-- Polya qo'shish -->
+  <div class="admin-card">
+    <h3>➕ <span data-i18n="add_field_btn">Yangi Polya Qo'shish</span></h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="field_name">POLYA NOMI</label>
+        <input type="text" id="f-name" placeholder="Polya 1 — Chilonzor">
+      </div>
+      <div class="form-group">
+        <label data-i18n="price_label">NARX (soatiga, so'm)</label>
+        <input type="number" id="f-price" placeholder="100000">
+      </div>
+      <div class="form-group">
+        <label data-i18n="district_label">TUMAN</label>
+        <select id="f-district" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 16px;color:#f1f5f9;font-family:inherit;font-size:0.88rem;outline:none;">
+          <option value="">Tuman tanlang...</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="desc_label">MANZIL (Yandex Maps uchun)</label>
+        <input type="text" id="f-desc" placeholder="Toshkent, Chilonzor tumani, Amir Temur ko'chasi 5">
+      </div>
+      <div class="form-group">
+        <label data-i18n="image_label">RASM (JPG/PNG)</label>
+        <input type="file" id="f-image" accept="image/*" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:10px 16px;color:#f1f5f9;font-family:inherit;font-size:0.85rem;">
+      </div>
+    </div>
+    <button class="btn-bron" style="max-width:220px" onclick="addField()" data-i18n="add_field_btn">➕ Polya Qo'shish</button>
+    <div id="field-msg"></div>
+  </div>
+
+  <!-- Polyalar ro'yxati -->
+  <div class="admin-card">
+    <h3 data-i18n="fields_list">🏟️ Polyalar Ro'yxati</h3>
+    <table>
+      <thead>
+        <tr>
+          <th data-i18n="col_num">#</th>
+          <th data-i18n="col_name">NOMI</th>
+          <th data-i18n="col_district">TUMAN</th>
+          <th data-i18n="col_price">NARX</th>
+          <th data-i18n="col_desc">MANZIL</th>
+          <th>RASM</th>
+          <th data-i18n="col_action">AMAL</th>
+        </tr>
+      </thead>
+      <tbody id="fields-body">
+        <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px" data-i18n="loading">Yuklanmoqda...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Bronlar ro'yxati -->
+  <div class="admin-card">
+    <h3 data-i18n="bookings_list">📋 Bronlar Ro'yxati</h3>
+    <div style="overflow-x:auto">
+      <table>
+        <thead>
+          <tr>
+            <th data-i18n="col_num">#</th>
+            <th data-i18n="col_user">ISM</th>
+            <th data-i18n="col_phone">TELEFON</th>
+            <th data-i18n="col_field">POLYA</th>
+            <th data-i18n="col_time">VAQT</th>
+            <th data-i18n="col_total">NARX</th>
+            <th data-i18n="col_status">HOLAT</th>
+            <th data-i18n="col_action">AMAL</th>
+          </tr>
+        </thead>
+        <tbody id="bookings-body">
+          <tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px" data-i18n="loading">Yuklanmoqda...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script>
+// District selectni to'ldirish
+fillDistrictSelect('f-district', false);
+
+async function loadAll() {
+  await Promise.all([loadFields(), loadBookings()]);
+}
+
+async function loadFields() {
+  const res = await fetch('/api/fields');
+  const fields = await res.json();
+  const t = translations[getLang()];
+  const tbody = document.getElementById('fields-body');
+  if(!fields.length) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">${t.no_fields_admin}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = fields.map((f,i) => {
+    const distName = f.district ? (t['district_'+f.district]||f.district) : '—';
+    const imgHtml = f.image_url ? `<img src="${f.image_url}" style="width:48px;height:36px;object-fit:cover;border-radius:6px;">` : '—';
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${f.name}</strong></td>
+      <td><span style="background:rgba(34,197,94,0.1);color:#22C55E;padding:2px 8px;border-radius:4px;font-size:0.75rem;">${distName}</span></td>
+      <td style="color:var(--green)">${f.price_per_hour.toLocaleString()} so'm</td>
+      <td style="color:var(--muted);font-size:0.82rem;">${f.description||'—'}</td>
+      <td>${imgHtml}</td>
+      <td><button class="btn-cancel" onclick="deleteField(${f.id})">${t.btn_delete||'🗑️ O\'chirish'}</button></td>
+    </tr>`;
+  }).join('');
+}
+
+async function loadBookings() {
+  const res = await fetch('/api/admin/bookings');
+  const bookings = await res.json();
+  const t = translations[getLang()];
+  document.getElementById('st-total').textContent = bookings.length;
+  document.getElementById('st-confirmed').textContent = bookings.filter(b=>b.status==='confirmed').length;
+  document.getElementById('st-cancelled').textContent = bookings.filter(b=>b.status==='cancelled').length;
+  const tbody = document.getElementById('bookings-body');
+  if(!bookings.length){
+    tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:20px">${t.no_bookings}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = bookings.map((b,i) => `<tr>
+    <td>${i+1}</td>
+    <td><strong>${b.user_name}</strong></td>
+    <td style="font-family:monospace;font-size:0.78rem">${b.user_phone}</td>
+    <td>Polya #${b.field_id}</td>
+    <td style="font-size:0.78rem">${b.start_time?b.start_time.replace('T',' ').slice(0,16):'—'}</td>
+    <td style="color:var(--green)">${b.total_price?b.total_price.toLocaleString()+' so\'m':'—'}</td>
+    <td><span class="tag ${b.status}">${b.status}</span></td>
+    <td>${b.status!=='cancelled'
+      ? `<button class="btn-cancel" onclick="cancelBooking(${b.id})">${t.btn_cancel||'Bekor qilish'}</button>`
+      : `<span style="color:var(--muted);font-size:0.75rem">${t.stat_cancelled||'bekor'}</span>`}</td>
+  </tr>`).join('');
+}
+
+async function addField() {
+  const name = document.getElementById('f-name').value.trim();
+  const price = document.getElementById('f-price').value;
+  const desc = document.getElementById('f-desc').value.trim();
+  const district = document.getElementById('f-district').value;
+  const imageFile = document.getElementById('f-image').files[0];
+  const msg = document.getElementById('field-msg');
+
+  if(!name||!price){
+    msg.className='msg-error';
+    msg.textContent='⚠️ Nom va narxni kiriting!';
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('name', name);
+  formData.append('price_per_hour', parseFloat(price));
+  formData.append('description', desc);
+  formData.append('district', district);
+  if(imageFile) formData.append('image', imageFile);
+
+  const res = await fetch('/api/fields/', { method:'POST', body:formData });
+  if(res.ok){
+    msg.className='msg-success';
+    msg.textContent='✅ Polya muvaffaqiyatli qo\'shildi!';
+    ['f-name','f-price','f-desc'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f-district').value='';
+    document.getElementById('f-image').value='';
+    loadFields();
+    setTimeout(()=>msg.textContent='', 3000);
+  } else {
+    msg.className='msg-error';
+    msg.textContent='❌ Xatolik yuz berdi!';
+  }
+}
+
+async function deleteField(id) {
+  if(!confirm('Bu polyani o\'chirishni tasdiqlaysizmi?')) return;
+  const res = await fetch('/api/fields/'+id, {method:'DELETE'});
+  if(res.ok) loadFields();
+}
+
+async function cancelBooking(id) {
+  if(!confirm('Bronni bekor qilishni tasdiqlaysizmi?')) return;
+  await fetch('/api/bookings/'+id, {method:'DELETE'});
+  loadBookings();
+}
+
+applyLang();
+loadAll();
+</script>
+</body>
+</html>

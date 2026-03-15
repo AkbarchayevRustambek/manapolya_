@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bog'lanish — ManaPolya</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/pages.css">
+</head>
+<body>
+<nav id="main-nav">
+  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:12px">
+    <img src="/static/images/logo.svg" height="48" style="border-radius:50%;object-fit:cover;width:48px;height:48px;border:2px solid #22C55E;">
+    <span style="font-size:1.2rem;font-weight:800;color:#f1f5f9">Mini<span style="color:#22C55E">Polya</span></span>
+  </a>
+  <div class="nav-links" id="nav-links"></div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-label" data-i18n="contact_label">BOG'LANISH</div>
+  <h1 data-i18n="contact_title">Kontakt <span>Ma'lumotlari</span></h1>
+</div>
+
+<div class="contact-wrap">
+  <div class="contact-left">
+    <div class="contact-card">
+      <div class="contact-icon">📍</div>
+      <div>
+        <div class="contact-card-title" data-i18n="address">Bizning joylashuvimiz</div>
+        <div class="contact-card-val">Toshkent sh, O'zbekiston</div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">📞</div>
+      <div>
+        <div class="contact-card-title" data-i18n="phone">Telefon raqami</div>
+        <div class="contact-card-val">+998 90 059 63 61</div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">✉️</div>
+      <div>
+        <div class="contact-card-title" data-i18n="email">Elektron pochta</div>
+        <div class="contact-card-val">akbarchayevrustambek@gmail.com</div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">🌐</div>
+      <div>
+        <div class="contact-card-title" data-i18n="social">Ijtimoiy tarmoqlar</div>
+        <div style="display:flex;gap:10px;margin-top:8px">
+          <a href="https://instagram.com/akbarchayevrustam" target="_blank" class="social-btn">📸 Instagram</a>
+          <a href="https://t.me/akbarchayev" target="_blank" class="social-btn">✈️ Telegram</a>
+        </div>
+      </div>
+    </div>
+    <div class="contact-card">
+      <div class="contact-icon">🕐</div>
+      <div>
+        <div class="contact-card-title" data-i18n="workhours">Ish vaqtlari</div>
+        <div class="contact-card-val" data-i18n="workhours_val">Dushanba - Yakshanba: 24/7</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="contact-right">
+    <h3 data-i18n="send_msg">Xabar yuborish</h3>
+    <div class="form-row">
+      <div class="form-group">
+        <label data-i18n="firstname">Ism</label>
+        <input type="text" id="c-name" placeholder="Rustam">
+      </div>
+      <div class="form-group">
+        <label data-i18n="lastname">Familiya</label>
+        <input type="text" id="c-surname" placeholder="Akbarchayev">
+      </div>
+    </div>
+    <div class="form-group">
+      <label data-i18n="email">Email</label>
+      <input type="email" id="c-email" placeholder="john@example.com">
+    </div>
+    <div class="form-group">
+      <label data-i18n="phone">Telefon</label>
+      <input type="text" id="c-phone" placeholder="+998 XX XXX XX XX">
+    </div>
+    <div class="form-group">
+      <label data-i18n="message">Xabaringiz</label>
+      <textarea id="c-msg" rows="5" placeholder="Xabaringizni bu yerga yozing..." style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:13px 16px;color:#f1f5f9;font-family:inherit;font-size:0.9rem;resize:vertical;outline:none;"></textarea>
+    </div>
+    <div id="c-result" style="display:none;padding:12px;border-radius:10px;margin-bottom:12px;font-size:0.85rem;"></div>
+    <button class="btn-primary" style="width:100%;justify-content:center;display:flex;" onclick="sendMessage()" data-i18n="send_btn">✉️ Xabar yuborish</button>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script>
+function sendMessage() {
+  const name = document.getElementById('c-name').value.trim();
+  const email = document.getElementById('c-email').value.trim();
+  const msg = document.getElementById('c-msg').value.trim();
+  const result = document.getElementById('c-result');
+  if (!name || !msg) {
+    result.style.display = 'block';
+    result.style.background = 'rgba(239,68,68,0.1)';
+    result.style.color = '#ef4444';
+    result.style.border = '1px solid #ef4444';
+    result.textContent = '⚠️ Ism va xabarni kiriting!';
+    return;
+  }
+  result.style.display = 'block';
+  result.style.background = 'rgba(34,197,94,0.1)';
+  result.style.color = '#22C55E';
+  result.style.border = '1px solid #22C55E';
+  result.textContent = '✅ Xabaringiz yuborildi! Tez orada bog\'lanamiz.';
+  document.getElementById('c-name').value = '';
+  document.getElementById('c-surname').value = '';
+  document.getElementById('c-email').value = '';
+  document.getElementById('c-phone').value = '';
+  document.getElementById('c-msg').value = '';
+}
+applyLang();
+renderNav('nav-links');
+</script>
+</body>
+</html>
