@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from database import get_engine, Base
+from database import engine, Base
 import models
 import os
 
 from routes import fields, bookings, admin
-engine = get_engine()
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Mana Polya Bron Tizimi")
