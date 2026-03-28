@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ManaPolya — Bron Tizimi</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<link rel="stylesheet" href="/static/css/pages.css">
+<style>
+.hero { min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 24px 80px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,rgba(34,197,94,0.13) 0%,transparent 70%),#0f172a; }
+.hero::before { content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(34,197,94,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(34,197,94,0.04) 1px,transparent 1px);background-size:60px 60px;pointer-events:none; }
+.hero-label { display:flex;align-items:center;gap:12px;color:#94a3b8;font-size:0.75rem;letter-spacing:0.15em;font-family:monospace;margin-bottom:28px;position:relative; }
+.hero-label::before,.hero-label::after { content:'';width:40px;height:1px;background:#334155; }
+.hero h1 { font-size:clamp(2.8rem,7vw,5rem);font-weight:800;line-height:1.08;letter-spacing:-0.02em;margin-bottom:24px;position:relative; }
+.hero h1 span { color:#22C55E; }
+.hero p { color:#94a3b8;font-size:1rem;max-width:540px;line-height:1.7;margin-bottom:40px;position:relative; }
+.hero-btns { display:flex;gap:12px;flex-wrap:wrap;justify-content:center;position:relative; }
+.scroll-hint { position:absolute;bottom:32px;left:50%;transform:translateX(-50%);color:#475569;font-size:0.68rem;letter-spacing:0.15em;font-family:monospace;display:flex;flex-direction:column;align-items:center;gap:6px; }
+.scroll-hint::after { content:'';width:1px;height:28px;background:linear-gradient(to bottom,#475569,transparent);animation:scrolldown 1.5s ease-in-out infinite; }
+@keyframes scrolldown { 0%,100%{opacity:0.3} 50%{opacity:1} }
+.section { max-width:1100px;margin:0 auto;padding:80px 24px; }
+.section-label { font-size:0.72rem;letter-spacing:0.18em;color:#22C55E;font-family:monospace;margin-bottom:12px;display:flex;align-items:center;gap:10px; }
+.section-label::before { content:'';width:24px;height:2px;background:#22C55E; }
+.why-grid { display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:40px; }
+@media(max-width:600px){.why-grid{grid-template-columns:1fr;}}
+.why-card { background:#1e293b;border:1px solid #334155;border-radius:14px;padding:24px;transition:all 0.2s; }
+.why-card:hover { border-color:#22C55E;transform:translateY(-4px); }
+.why-num { font-size:2.5rem;font-weight:800;color:rgba(34,197,94,0.15);font-family:monospace;line-height:1;margin-bottom:12px; }
+.why-icon { width:44px;height:44px;background:rgba(34,197,94,0.1);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:12px; }
+.why-card h3 { font-size:1rem;font-weight:700;margin-bottom:8px; }
+.why-card p { font-size:0.82rem;color:#64748b;line-height:1.6; }
+.why-wrap { display:grid;grid-template-columns:1fr 1.2fr;gap:60px;align-items:start; }
+@media(max-width:768px){.why-wrap{grid-template-columns:1fr;}}
+.how-step { display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;margin-bottom:80px; }
+.how-step:nth-child(even) { direction:rtl; }
+.how-step:nth-child(even) > * { direction:ltr; }
+@media(max-width:768px){.how-step{grid-template-columns:1fr;}.how-step:nth-child(even){direction:ltr;}}
+.how-num { font-size:5rem;font-weight:800;color:rgba(34,197,94,0.2);font-family:monospace;line-height:1; }
+.how-icon-box { width:52px;height:52px;background:#1e293b;border:1px solid #334155;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin-bottom:16px; }
+.how-step h3 { font-size:1.5rem;font-weight:800;margin-bottom:8px; }
+.how-step p { color:#94a3b8;line-height:1.7; }
+.how-visual { background:#1e293b;border:1px solid #334155;border-radius:20px;height:280px;display:flex;align-items:center;justify-content:center;font-size:5rem; }
+.reviews-wrap { display:grid;grid-template-columns:1fr 2fr;gap:60px;align-items:start; }
+@media(max-width:768px){.reviews-wrap{grid-template-columns:1fr;}}
+.reviews-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+@media(max-width:500px){.reviews-grid{grid-template-columns:1fr;}}
+.review-card { background:#1e293b;border:1px solid #334155;border-radius:14px;padding:20px;transition:all 0.2s; }
+.review-card:hover { transform:translateY(-2px); }
+.review-quote { font-size:2rem;color:rgba(34,197,94,0.3);line-height:1;margin-bottom:8px; }
+.review-stars { color:#22C55E;font-size:0.85rem;margin-bottom:10px; }
+.review-text { font-size:0.82rem;color:#94a3b8;line-height:1.6;margin-bottom:14px; }
+.review-author { font-size:0.78rem;font-weight:700;color:#f1f5f9; }
+.review-role { font-size:0.72rem;color:#64748b; }
+.faq-wrap { display:grid;grid-template-columns:1fr 1.5fr;gap:60px;align-items:start; }
+@media(max-width:768px){.faq-wrap{grid-template-columns:1fr;}}
+.faq-item { border-bottom:1px solid #1e293b;padding:20px 0;cursor:pointer; }
+.faq-item:first-child { border-top:1px solid #1e293b; }
+.faq-header { display:flex;align-items:center;gap:16px; }
+.faq-num { font-size:0.78rem;color:#22C55E;font-family:monospace;font-weight:700;width:28px;flex-shrink:0; }
+.faq-q { font-size:0.95rem;font-weight:600;flex:1; }
+.faq-arrow { color:#64748b;transition:transform 0.3s;font-size:0.8rem; }
+.faq-item.open .faq-arrow { transform:rotate(180deg); }
+.faq-a { display:none;font-size:0.85rem;color:#64748b;line-height:1.7;padding-top:12px;padding-left:44px; }
+.faq-item.open .faq-a { display:block; }
+.contact-bottom { background:#111827;border-top:1px solid #1e293b;padding:80px 24px; }
+.contact-bottom-wrap { max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.5fr;gap:60px; }
+@media(max-width:768px){.contact-bottom-wrap{grid-template-columns:1fr;}}
+.contact-info-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px; }
+.ci-card { background:#1e293b;border:1px solid #334155;border-radius:12px;padding:18px; }
+.ci-icon { font-size:1.4rem;margin-bottom:8px; }
+.ci-title { font-size:0.72rem;color:#64748b;font-family:monospace;margin-bottom:4px; }
+.ci-val { font-size:0.85rem;font-weight:600; }
+.socials { display:flex;gap:10px;margin-top:14px; }
+.social-link { width:40px;height:40px;background:#1e293b;border:1px solid #334155;border-radius:10px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:1.1rem;transition:all 0.2s; }
+.social-link:hover { border-color:#22C55E;transform:translateY(-2px); }
+.stats-bar { background:#111827;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b; }
+.stats-bar-inner { max-width:1100px;margin:0 auto;display:flex;justify-content:center;gap:60px;padding:40px 24px; }
+@media(max-width:600px){.stats-bar-inner{gap:24px;flex-wrap:wrap;}}
+.stat-item { text-align:center; }
+.stat-num { font-size:2rem;font-weight:800;color:#22C55E; }
+.stat-lbl { font-size:0.78rem;color:#64748b;margin-top:4px; }
+
+/* DISTRICT FILTER */
+.district-filter { background:#111827;border-bottom:1px solid #1e293b;padding:20px 24px; }
+.district-filter-inner { max-width:1100px;margin:0 auto; }
+.district-filter-title { font-size:0.72rem;color:#64748b;font-family:monospace;letter-spacing:0.12em;margin-bottom:12px; }
+.district-btns { display:flex;flex-wrap:wrap;gap:8px; }
+.d-btn { background:#1e293b;border:1px solid #334155;color:#94a3b8;font-size:0.78rem;font-weight:600;padding:7px 16px;border-radius:50px;cursor:pointer;transition:all 0.2s;font-family:inherit; }
+.d-btn:hover { border-color:#22C55E;color:#22C55E; }
+.d-btn.active { background:#22C55E;border-color:#22C55E;color:#000; }
+
+/* FIELDS KARUSEL */
+.fields-track { display:flex;gap:20px;transition:transform 0.6s cubic-bezier(.4,0,.2,1);will-change:transform; }
+.field-card { background:#1e293b;border:1px solid #334155;border-radius:16px;overflow:hidden;transition:border-color 0.3s,box-shadow 0.3s;flex-shrink:0;width:360px; }
+.field-card:hover { border-color:#22C55E;box-shadow:0 16px 40px rgba(0,0,0,0.3); }
+.field-img { height:200px;position:relative;overflow:hidden; }
+.badge-size { position:absolute;top:12px;left:12px;background:rgba(15,23,42,0.85);color:#e2e8f0;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:6px;z-index:3; }
+.badge-district { position:absolute;top:12px;right:12px;background:rgba(34,197,94,0.85);color:#000;font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:6px;z-index:3; }
+.field-location { position:absolute;bottom:12px;left:12px;color:#fff;font-size:0.76rem;z-index:3;text-decoration:none;display:flex;align-items:center;gap:5px;background:rgba(0,0,0,0.5);padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,0.15);transition:all 0.2s;backdrop-filter:blur(4px); }
+.field-location:hover { background:#22C55E;color:#000;border-color:#22C55E; }
+.field-info { padding:16px 18px 18px; }
+.field-info h3 { font-size:1rem;font-weight:700;margin-bottom:10px; }
+.field-tags { display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px; }
+.field-tag { background:#0f172a;color:#94a3b8;font-size:0.68rem;padding:3px 8px;border-radius:5px;border:1px solid #334155; }
+.field-bottom { display:flex;align-items:center;justify-content:space-between; }
+.price { color:#22C55E;font-weight:800;font-size:1rem; }
+.price small { color:#94a3b8;font-weight:400;font-size:0.75rem; }
+.btn-bron-sm { background:#22C55E;color:#000;font-weight:700;font-size:0.82rem;padding:9px 18px;border-radius:50px;text-decoration:none;transition:all 0.2s; }
+.btn-bron-sm:hover { background:#16a34a; }
+.carousel-btn { width:38px;height:38px;background:#1e293b;border:1px solid #334155;border-radius:50%;color:#fff;cursor:pointer;font-size:1rem;transition:all 0.2s;display:flex;align-items:center;justify-content:center; }
+.carousel-btn:hover { border-color:#22C55E;color:#22C55E; }
+.f-dot { display:inline-block;height:8px;border-radius:4px;cursor:pointer;transition:all 0.3s;background:#334155;width:8px; }
+
+/* BRONLAR KARUSEL */
+.bookings-carousel-outer { overflow:hidden;padding:0 24px;max-width:1148px;margin:0 auto; }
+.bookings-carousel { display:flex;gap:16px;transition:transform 0.5s cubic-bezier(.4,0,.2,1); }
+.booking-slide { flex-shrink:0;width:260px;background:#1e293b;border:1px solid #334155;border-radius:14px;padding:18px 20px; }
+.bs-field { font-size:0.78rem;font-weight:700;color:#22C55E;margin-bottom:6px; }
+.bs-name { font-size:0.95rem;font-weight:700;margin-bottom:4px; }
+.bs-time { font-size:0.72rem;color:#64748b;font-family:monospace;margin-bottom:10px; }
+.bs-status { display:inline-block;font-size:0.7rem;padding:3px 10px;border-radius:50px; }
+.bs-confirmed { background:rgba(34,197,94,0.12);color:#22C55E;border:1px solid rgba(34,197,94,0.3); }
+.bs-pending { background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.3); }
+
+/* ── HUDUDLAR SECTION ───────────────────────────────────────── */
+.hudud-section {
+  background: #0a1628;
+  border-top: 1px solid #1e293b;
+  padding: 60px 0 50px;
+}
+.hudud-inner { max-width:1100px;margin:0 auto;padding:0 24px; }
+.hudud-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 32px;
+}
+@media(max-width:900px){.hudud-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.hudud-grid{grid-template-columns:repeat(2,1fr);}}
+.hudud-card {
+  background:#1e293b;border:1px solid #334155;border-radius:14px;
+  padding:18px 16px;cursor:pointer;transition:all 0.25s;
+  display:flex;flex-direction:column;gap:8px;
+  text-decoration:none;position:relative;overflow:hidden;
+}
+.hudud-card:hover { border-color:#22C55E;transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,0.3); }
+.hudud-card.hc-active { border-color:#22C55E;background:rgba(34,197,94,0.07); }
+.hudud-card.hc-active .hc-name { color:#22C55E; }
+.hc-top { display:flex;align-items:center;justify-content:space-between; }
+.hc-icon { width:38px;height:38px;background:rgba(34,197,94,0.08);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;transition:background 0.25s; }
+.hudud-card.hc-active .hc-icon { background:rgba(34,197,94,0.18); }
+.hc-count { font-size:0.68rem;color:#22C55E;font-weight:700;font-family:monospace;background:rgba(34,197,94,0.1);padding:2px 7px;border-radius:50px; }
+.hc-name { font-size:0.88rem;font-weight:700;color:#f1f5f9;line-height:1.3;transition:color 0.25s; }
+.hc-sub { font-size:0.7rem;color:#475569; }
+.hudud-all-btn {
+  background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.25);
+  border-radius:14px;padding:18px 16px;cursor:pointer;transition:all 0.25s;
+  color:#22C55E;font-weight:700;font-size:0.85rem;text-decoration:none;
+  display:flex;flex-direction:column;gap:8px;align-items:flex-start;
+}
+.hudud-all-btn:hover { background:rgba(34,197,94,0.13);transform:translateY(-3px); }
+.hudud-all-btn.hc-active { background:#22C55E;color:#000;border-color:#22C55E; }
+.hudud-result-bar {
+  margin-top:24px;padding:12px 18px;background:#1e293b;
+  border:1px solid #334155;border-radius:12px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.hrb-left { display:flex;align-items:center;gap:10px;font-size:0.85rem; }
+.hrb-district { font-weight:700;color:#22C55E; }
+.hrb-count { color:#64748b;font-size:0.78rem; }
+.hrb-clear { font-size:0.75rem;color:#64748b;cursor:pointer;padding:4px 12px;border:1px solid #334155;border-radius:50px;background:none;transition:all 0.2s;font-family:inherit; }
+.hrb-clear:hover { border-color:#ef4444;color:#ef4444; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:12px">
+    <img src="/static/images/logo.svg" alt="ManaPolya" height="48" style="border-radius:50%;object-fit:cover;width:48px;height:48px;border:2px solid #22C55E;">
+    <span style="font-size:1.2rem;font-weight:800;color:#f1f5f9">Mana<span style="color:#22C55E">Polya</span></span>
+  </a>
+  <div class="nav-links" id="nav-links"></div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-label" data-i18n="hero_label">MINI STADIONNI BRON QILING</div>
+  <h1>Futbol o'yinlari<br>uchun <span data-i18n="venues_title">maydonni</span><br>bron qiling</h1>
+  <p data-i18n="hero_sub">Oson bron qilish, ajoyib joylashuvlar va raqobatbardosh narxlar.</p>
+  <div class="hero-btns">
+    <a href="#polyalar" class="btn-primary" data-i18n="hero_btn1">Maydonlarni ko'rish ↓</a>
+    <a href="#qanday" class="btn-outline" data-i18n="hero_btn2">▷ Qanday ishlaydi</a>
+    <a href="/kontakt" class="btn-outline" data-i18n="hero_btn3">📞 Bog'lanish</a>
+  </div>
+  <div class="scroll-hint">SCROLL</div>
+</div>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item"><div class="stat-num" id="stat-fields">—</div><div class="stat-lbl" data-i18n="stat_fields">Maydon</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat-bookings">—</div><div class="stat-lbl" data-i18n="stat_bookings">Jami bron</div></div>
+    <div class="stat-item"><div class="stat-num">24/7</div><div class="stat-lbl" data-i18n="stat_works">Ishlaydi</div></div>
+    <div class="stat-item"><div class="stat-num">100%</div><div class="stat-lbl" data-i18n="stat_safe">Xavfsiz to'lov</div></div>
+  </div>
+</div>
+
+
+<!-- ── HUDUDLAR BO'YICHA ─────────────────────────────────────── -->
+<div class="hudud-section" id="hududlar">
+  <div class="hudud-inner">
+    <div class="section-label" data-i18n="hudud_label">HUDUDLAR BO'YICHA</div>
+    <h2 style="font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;margin-bottom:10px" data-i18n="hudud_title">O'zingizga yaqin hududni tanlang</h2>
+    <p style="color:#64748b;font-size:0.88rem;max-width:480px;line-height:1.7" data-i18n="hudud_sub">Toshkentdagi barcha tumanlar bo'yicha maydonlarni toping</p>
+    <div class="hudud-grid" id="hudud-grid"></div>
+    <div class="hudud-result-bar" id="hudud-result" style="display:none;">
+      <div class="hrb-left">
+        <span>📍</span>
+        <span class="hrb-district" id="hrb-name">—</span>
+        <span class="hrb-count" id="hrb-count"></span>
+      </div>
+      <button class="hrb-clear" onclick="huducClear()" data-i18n="hudud_clear">✕ Filterni tozalash</button>
+    </div>
+  </div>
+</div>
+<!-- ── /HUDUDLAR BO'YICHA ────────────────────────────────────── -->
+
+<!-- MAYDONLAR + FILTER -->
+<div id="polyalar" style="padding:64px 0 0;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px 28px;">
+    <div class="section-label" data-i18n="venues_label">VENUES</div>
+    <h2 style="font-size:clamp(2rem,4vw,3rem);font-weight:800;margin-bottom:8px" data-i18n="venues_title">Mavjud maydonlar</h2>
+    <p style="color:#94a3b8;max-width:500px;line-height:1.7" data-i18n="venues_sub">Toshkent bo'ylab yuqori sifatli futbol maydonlarini kashf eting.</p>
+  </div>
+
+  <!-- TUMAN FILTER -->
+  <div class="district-filter">
+    <div class="district-filter-inner">
+      <div class="district-filter-title" data-i18n="filter_title">TUMAN BO'YICHA QIDIRING</div>
+      <div class="district-btns" id="district-btns"></div>
+    </div>
+  </div>
+
+  <!-- KARUSEL -->
+  <div style="padding:32px 0 0;">
+    <div style="overflow:hidden;padding:0 24px;">
+      <div class="fields-track" id="fields-grid"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:20px;">
+      <button class="carousel-btn" onclick="fPrev()">&#8592;</button>
+      <div id="f-dots" style="display:flex;gap:6px;align-items:center;"></div>
+      <button class="carousel-btn" onclick="fNext()">&#8594;</button>
+    </div>
+  </div>
+</div>
+
+<!-- BRONLAR KARUSEL -->
+<div id="bronlar-section" style="background:#111827;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;padding:48px 0;margin-top:40px;display:none;">
+  <div style="max-width:1100px;margin:0 auto;padding:0 24px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <div>
+      <div class="section-label" data-i18n="bookings_label">SO'NGGI BRONLAR</div>
+      <h2 style="font-size:1.5rem;font-weight:800;margin-bottom:2px" data-i18n="bookings_title">Oxirgi bronlar</h2>
+      <p style="color:#64748b;font-size:0.78rem;" data-i18n="bookings_sub">Real vaqtda yangilanib turadi</p>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="carousel-btn" onclick="carouselPrev()">&#8592;</button>
+      <button class="carousel-btn" onclick="carouselNext()">&#8594;</button>
+    </div>
+  </div>
+  <div class="bookings-carousel-outer">
+    <div class="bookings-carousel" id="bookings-carousel"></div>
+  </div>
+</div>
+
+<!-- NIMA UCHUN -->
+<div class="section">
+  <div class="why-wrap">
+    <div>
+      <div class="section-label" data-i18n="why_label">NIMA UCHUN MANAPOLYA</div>
+      <h2>Nima uchun<br><span style="color:#22C55E" data-i18n="why_title">ManaPolya?</span></h2>
+      <p style="color:#94a3b8;line-height:1.7;margin-top:16px" data-i18n="why_sub">Bizning platformamiz futbol maydonlarini bron qilishni tez, qulay va oson qiladi.</p>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><div class="why-icon">📅</div><div class="why-num">01</div><h3 data-i18n="why1_title">Oson bron</h3><p data-i18n="why1_text">Intuitiv interfeys bilan maydonlarni osongina qidirib, bron qiling.</p></div>
+      <div class="why-card"><div class="why-icon">🕐</div><div class="why-num">02</div><h3 data-i18n="why2_title">Jonli mavjudlik</h3><p data-i18n="why2_text">Qaysi vaqtlarda bo'sh joy borligini darhol ko'ring.</p></div>
+      <div class="why-card"><div class="why-icon">🗺️</div><div class="why-num">03</div><h3 data-i18n="why3_title">Turli joylashuvlar</h3><p data-i18n="why3_text">Toshkentning barcha tumanlarida maydonlar mavjud.</p></div>
+      <div class="why-card"><div class="why-icon">💳</div><div class="why-num">04</div><h3 data-i18n="why4_title">Xavfsiz to'lovlar</h3><p data-i18n="why4_text">Turli to'lov usullari bilan xavfsiz to'lov qiling.</p></div>
+      <div class="why-card"><div class="why-icon">👥</div><div class="why-num">05</div><h3 data-i18n="why5_title">Jamiyat yaratish</h3><p data-i18n="why5_text">Boshqa futbolchilar bilan bog'laning, jamoalar tuzing.</p></div>
+      <div class="why-card"><div class="why-icon">⭐</div><div class="why-num">06</div><h3 data-i18n="why6_title">Sifat kafolati</h3><p data-i18n="why6_text">Barcha maydonlar foydalanuvchilar tomonidan tasdiqlanadi.</p></div>
+    </div>
+  </div>
+</div>
+
+<!-- QANDAY ISHLAYDI -->
+<div style="background:#111827;border-top:1px solid #1e293b;border-bottom:1px solid #1e293b;" id="qanday">
+  <div class="section">
+    <div class="section-label" data-i18n="how_label">JARAYON</div>
+    <h2 data-i18n="how_title">Qanday ishlaydi?</h2>
+    <div style="margin-top:60px">
+      <div class="how-step">
+        <div><div style="display:flex;align-items:center;gap:16px;margin-bottom:16px"><div class="how-num">01</div><div class="how-icon-box">🔍</div></div><h3 data-i18n="how1_title">Maydonni tanlang</h3><p style="color:#94a3b8;line-height:1.7;margin-top:8px" data-i18n="how1_text">Tuman va vaqt bo'yicha qidiring.</p></div>
+        <div class="how-visual">🏟️</div>
+      </div>
+      <div class="how-step">
+        <div><div style="display:flex;align-items:center;gap:16px;margin-bottom:16px"><div class="how-num">02</div><div class="how-icon-box">📅</div></div><h3 data-i18n="how2_title">Vaqtni belgilang</h3><p style="color:#94a3b8;line-height:1.7;margin-top:8px" data-i18n="how2_text">Mavjud vaqt oralig'ini tanlang.</p></div>
+        <div class="how-visual">📆</div>
+      </div>
+      <div class="how-step">
+        <div><div style="display:flex;align-items:center;gap:16px;margin-bottom:16px"><div class="how-num">03</div><div class="how-icon-box">💳</div></div><h3 data-i18n="how3_title">To'lang va o'ynang</h3><p style="color:#94a3b8;line-height:1.7;margin-top:8px" data-i18n="how3_text">Xavfsiz to'lovni amalga oshiring va o'yindan zavqlaning!</p></div>
+        <div class="how-visual">⚽</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<div style="background:#0f172a;border-top:1px solid #1e293b;">
+  <div class="section">
+    <div class="reviews-wrap">
+      <div>
+        <div class="section-label" data-i18n="reviews_label">REVIEWS</div>
+        <h2 data-i18n="reviews_title">Foydalanuvchilarimiz nima deydi</h2>
+        <p style="color:#94a3b8;line-height:1.7;margin-top:16px" data-i18n="reviews_sub">Futbolchilar va maydon menejerlari ManaPolya haqida nima deyishlarini ko'ring.</p>
+      </div>
+      <div class="reviews-grid">
+        <div class="review-card"><div class="review-quote">❝</div><div class="review-stars">★★★★★</div><p class="review-text">Ilova juda tez ishlaydi va interfeysi aniq!</p><div class="review-author">Jasur T.</div><div class="review-role">Futbol ishqibozi</div></div>
+        <div class="review-card"><div class="review-quote">❝</div><div class="review-stars">★★★★★</div><p class="review-text">Juda qulay xizmat! Endi administratorlarga qo'ng'iroq shart emas.</p><div class="review-author">Zubayr A.</div><div class="review-role">Jamoa kapitani</div></div>
+        <div class="review-card"><div class="review-quote">❝</div><div class="review-stars">★★★★★</div><p class="review-text">ManaPolya jamoamizning mashg'ulot jadvalini soddalashtirdi!</p><div class="review-author">Rustambek A.</div><div class="review-role">Murabbiy</div></div>
+        <div class="review-card"><div class="review-quote">❝</div><div class="review-stars">★★★★☆</div><p class="review-text">Bir necha soniyada bron qilish — ajoyib!</p><div class="review-author">Dilnoza K.</div><div class="review-role">Sport ixlosmandi</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="section">
+  <div class="faq-wrap">
+    <div>
+      <div class="section-label" data-i18n="faq_label">FAQ</div>
+      <h2 data-i18n="faq_title">Tez-tez so'raladigan savollar</h2>
+      <p style="color:#94a3b8;line-height:1.7;margin-top:16px" data-i18n="faq_sub">Eng ko'p uchraydigan savollarga javoblar.</p>
+      <p style="margin-top:20px;font-size:0.85rem;color:#64748b">Yana savollaringiz bormi? <a href="/kontakt" style="color:#22C55E;text-decoration:none;font-weight:700" data-i18n="faq_link">Biz bilan bog'laning →</a></p>
+    </div>
+    <div>
+      <div class="faq-item open" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">01</span><span class="faq-q" data-i18n="faq1_q">ManaPolya nima?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq1_a">ManaPolya — Toshkentdagi mini futbol maydonlarini online bron qilish platformasi.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">02</span><span class="faq-q" data-i18n="faq2_q">Bron qilish qanday ishlaydi?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq2_a">Maydonni tanlang → vaqtni belgilang → 50% oldindan to'lang. Bron tayyor!</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">03</span><span class="faq-q" data-i18n="faq3_q">Ro'yxatdan o'tish kerakmi?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq3_a">Yo'q, faqat ism va telefon raqamingizni kiriting.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">04</span><span class="faq-q" data-i18n="faq4_q">Bronni bekor qilish mumkinmi?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq4_a">Ha, +998 90 059 63 61 raqamiga qo'ng'iroq qiling.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">05</span><span class="faq-q" data-i18n="faq5_q">To'lov qanday amalga oshiriladi?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq5_a">Oldindan 50% to'lov. Tez orada Payme va Click qo'shiladi.</div></div>
+      <div class="faq-item" onclick="toggleFaq(this)"><div class="faq-header"><span class="faq-num">06</span><span class="faq-q" data-i18n="faq6_q">Pulni qaytarib olish mumkinmi?</span><span class="faq-arrow">▼</span></div><div class="faq-a" data-i18n="faq6_a">24 soat oldin bekor qilsangiz to'liq qaytariladi.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT BOTTOM -->
+<div class="contact-bottom">
+  <div class="contact-bottom-wrap">
+    <div>
+      <div class="section-label" data-i18n="contact_label">CONTACT</div>
+      <h2 style="font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;margin-bottom:8px" data-i18n="contact_title">Biz bilan bog'laning</h2>
+      <p style="color:#94a3b8;line-height:1.7;margin-bottom:24px" data-i18n="contact_sub">Savollaringiz bormi? Biz doim yordam berishga tayyormiz.</p>
+      <div class="contact-info-grid">
+        <div class="ci-card"><div class="ci-icon">📍</div><div class="ci-title" data-i18n="contact_address">MANZIL</div><div class="ci-val" data-i18n="contact_address_val">Toshkent sh, O'zbekiston</div></div>
+        <div class="ci-card"><div class="ci-icon">📞</div><div class="ci-title" data-i18n="contact_phone">TELEFON</div><div class="ci-val">+998 90 059 63 61</div></div>
+        <div class="ci-card"><div class="ci-icon">✉️</div><div class="ci-title" data-i18n="contact_email">EMAIL</div><div class="ci-val" style="font-size:0.78rem">akbarchayevrustambek@gmail.com</div></div>
+        <div class="ci-card"><div class="ci-icon">🕐</div><div class="ci-title" data-i18n="contact_hours">ISH VAQTI</div><div class="ci-val" data-i18n="contact_hours_val">24/7</div></div>
+      </div>
+      <div class="socials">
+        <a href="https://instagram.com/akbarchayevrustam" target="_blank" class="social-link">📸</a>
+        <a href="https://t.me/akbarchayev" target="_blank" class="social-link">✈️</a>
+      </div>
+    </div>
+    <div style="background:#1e293b;border:1px solid #334155;border-radius:16px;padding:28px">
+      <h3 style="font-size:1.2rem;font-weight:700;margin-bottom:20px" data-i18n="msg_title">Xabar yuborish</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="form-group" style="margin:0"><label data-i18n="firstname">ISM</label><input type="text" id="c-name" placeholder="Rustam"></div>
+        <div class="form-group" style="margin:0"><label data-i18n="lastname">FAMILIYA</label><input type="text" id="c-surname" placeholder="Akbarchayev"></div>
+      </div>
+      <div class="form-group"><label data-i18n="email_label">EMAIL</label><input type="email" id="c-email" placeholder="john@example.com"></div>
+      <div class="form-group"><label data-i18n="phone_label">TELEFON</label><input type="text" id="c-phone" placeholder="+998 XX XXX XX XX"></div>
+      <div class="form-group">
+        <label data-i18n="message">XABAR</label>
+        <textarea id="c-msg" rows="4" data-i18n-ph="message_ph" placeholder="Xabaringizni bu yerga yozing..." style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:10px;padding:12px 16px;color:#f1f5f9;font-family:inherit;font-size:0.88rem;resize:vertical;outline:none;"></textarea>
+      </div>
+      <div id="c-result" style="display:none;padding:10px;border-radius:8px;margin-bottom:12px;font-size:0.82rem;"></div>
+      <button class="btn-primary" style="width:100%;justify-content:center;display:flex;" onclick="sendMsg()"><span data-i18n="send_btn">✉️ Yuborish</span></button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/js/i18n.js"></script>
+<script>
+// ── POLYALAR KARUSEL ──────────────────────────
+let fIdx = 0, fTotal = 0, fAutoTimer = null;
+const F_W = 380;
+let allFields = [], currentDistrict = 'all';
+
+function fUpdateCarousel() {
+  const el = document.getElementById('fields-grid');
+  if (el) el.style.transform = `translateX(-${fIdx * F_W}px)`;
+  document.querySelectorAll('.f-dot').forEach((d, i) => {
+    d.style.background = i === fIdx ? '#22C55E' : '#334155';
+    d.style.width = i === fIdx ? '20px' : '8px';
+  });
+}
+function fNext() { if(fTotal>1){ fIdx=(fIdx+1)%fTotal; fUpdateCarousel(); } }
+function fPrev() { if(fTotal>1){ fIdx=(fIdx-1+fTotal)%fTotal; fUpdateCarousel(); } }
+function fGoTo(i) { fIdx=i; fUpdateCarousel(); }
+
+function startFAuto() {
+  if(fAutoTimer) clearInterval(fAutoTimer);
+  if(fTotal>1) fAutoTimer = setInterval(fNext, 3000);
+}
+
+// ── BRONLAR KARUSEL ──────────────────────────
+let cIdx=0, cTotal=0;
+const C_W=276;
+function cUpdate(){ const el=document.getElementById('bookings-carousel'); if(el) el.style.transform=`translateX(-${cIdx*C_W}px)`; }
+function carouselNext(){ cIdx=Math.min(cIdx+1,Math.max(0,cTotal-4)); cUpdate(); }
+function carouselPrev(){ cIdx=Math.max(0,cIdx-1); cUpdate(); }
+
+// ── DISTRICT FILTER ──────────────────────────
+function renderDistrictBtns() {
+  const wrap = document.getElementById('district-btns');
+  if(!wrap) return;
+  const t = translations[getLang()];
+  let html = `<button class="d-btn ${currentDistrict==='all'?'active':''}" onclick="filterDistrict('all')">${t.filter_all}</button>`;
+  DISTRICTS.forEach(d => {
+    const name = t[d.key] || d.value;
+    html += `<button class="d-btn ${currentDistrict===d.value?'active':''}" onclick="filterDistrict('${d.value}')">${name}</button>`;
+  });
+  wrap.innerHTML = html;
+}
+
+function filterDistrict(district) {
+  currentDistrict = district;
+  renderDistrictBtns();
+  renderFields(district === 'all' ? allFields : allFields.filter(f => f.district === district));
+}
+
+// ── FIELDS RENDER ────────────────────────────
+function renderFields(fields) {
+  const grid = document.getElementById('fields-grid');
+  const dotsEl = document.getElementById('f-dots');
+  if(fAutoTimer) clearInterval(fAutoTimer);
+  fIdx = 0;
+
+  if (!fields.length) {
+    const t = translations[getLang()];
+    const msg = currentDistrict === 'all' ? t.no_fields : t.filter_no_results;
+    grid.innerHTML = `<div style="text-align:center;padding:60px 24px;min-width:100vw">
+      <div style="font-size:3rem;margin-bottom:16px">⚽</div>
+      <p style="color:#475569;margin-bottom:16px">${msg}</p>
+    </div>`;
+    dotsEl.innerHTML = '';
+    return;
+  }
+
+  const t = translations[getLang()];
+  fTotal = fields.length;
+  grid.innerHTML = fields.map(f => {
+    const mapsUrl = 'https://yandex.com/maps/?text=' + encodeURIComponent((f.description||f.name)+', Toshkent');
+    const districtName = f.district ? (t['district_'+f.district] || f.district) : '';
+    const imgSrc = f.image_url || '/static/images/s1.jpg';
+    return `<div class="field-card">
+      <div class="field-img" onmouseenter="startImgCarousel(${f.id})" onmouseleave="stopImgCarousel(${f.id})">
+        <span class="badge-size">5x5</span>
+        ${districtName ? `<span class="badge-district">${districtName}</span>` : ''}
+        <img src="${imgSrc}" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;transition:opacity 0.8s;opacity:1;" class="slide-${f.id}">
+        <img src="/static/images/s2.jpg" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;transition:opacity 0.8s;opacity:0;" class="slide-${f.id}">
+        <a href="${mapsUrl}" target="_blank" class="field-location">📍 ${f.description||'Manzilni ko\'rish'}</a>
+      </div>
+      <div class="field-info">
+        <h3>${f.name}</h3>
+        <div class="field-tags">
+          <span class="field-tag" data-i18n="tag_lighting">${t.tag_lighting||'Yoritish'}</span>
+          <span class="field-tag" data-i18n="tag_covered">${t.tag_covered||'Yopiq'}</span>
+          <span class="field-tag" data-i18n="tag_locker">${t.tag_locker||'Kiyinish xonasi'}</span>
+        </div>
+        <div class="field-bottom">
+          <div class="price">${f.price_per_hour.toLocaleString()} so'm <small>${t.field_per_hour||'/ soat'}</small></div>
+          <a href="/bron/${f.id}" class="btn-bron-sm">${t.btn_book||'Bron qilish ↗'}</a>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+
+  dotsEl.innerHTML = fields.map((_,i) =>
+    `<span class="f-dot ${i===0?'active':''}" onclick="fGoTo(${i})" style="width:${i===0?'20px':'8px'};background:${i===0?'#22C55E':'#334155'};"></span>`
+  ).join('');
+
+  fUpdateCarousel();
+  startFAuto();
+}
+
+// ── ASOSIY YUKLASH ───────────────────────────
+async function loadFields() {
+  const [fr, br] = await Promise.all([fetch('/api/fields'), fetch('/api/bookings')]);
+  const fields = await fr.json();
+  const bookings = await br.json();
+
+  document.getElementById('stat-fields').textContent = fields.length;
+  document.getElementById('stat-bookings').textContent = bookings.length;
+
+  allFields = fields;
+  renderHudud(fields);
+  renderDistrictBtns();
+  renderFields(fields);
+
+  // Bronlar karusel
+  if(bookings.length > 0) {
+    const t = translations[getLang()];
+    const fieldMap = {};
+    fields.forEach(f => fieldMap[f.id] = f.name);
+    const recent = bookings.slice(-20).reverse();
+    cTotal = recent.length;
+    document.getElementById('bookings-carousel').innerHTML = recent.map(b => {
+      const dt = b.start_time ? b.start_time.replace('T',' ').slice(0,16) : '—';
+      const ok = b.status === 'confirmed';
+      return `<div class="booking-slide">
+        <div class="bs-field">⚽ ${fieldMap[b.field_id]||'Polya #'+b.field_id}</div>
+        <div class="bs-name">${b.user_name}</div>
+        <div class="bs-time">${dt}</div>
+        <span class="bs-status ${ok?'bs-confirmed':'bs-pending'}">${ok?t.status_confirmed:t.status_pending}</span>
+      </div>`;
+    }).join('');
+    document.getElementById('bronlar-section').style.display='block';
+    setInterval(()=>{ cIdx=(cIdx+1)%Math.max(1,cTotal-3); cUpdate(); }, 3000);
+  }
+}
+
+// ── RASM KARUSEL (hover) ─────────────────────
+const imgTimers = {};
+function startImgCarousel(id) {
+  const slides = document.querySelectorAll(`.slide-${id}`);
+  let cur=0;
+  imgTimers[id] = setInterval(()=>{ slides[cur].style.opacity='0'; cur=(cur+1)%slides.length; slides[cur].style.opacity='1'; }, 900);
+}
+function stopImgCarousel(id) {
+  clearInterval(imgTimers[id]);
+  document.querySelectorAll(`.slide-${id}`).forEach((s,i)=>s.style.opacity=i===0?'1':'0');
+}
+
+function toggleFaq(item) { item.classList.toggle('open'); }
+
+function sendMsg() {
+  const t = translations[getLang()];
+  const name=document.getElementById('c-name').value.trim();
+  const msg=document.getElementById('c-msg').value.trim();
+  const result=document.getElementById('c-result');
+  if(!name||!msg){
+    result.style.cssText='display:block;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid #ef4444;padding:10px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
+    result.textContent=t.msg_err; return;
+  }
+  result.style.cssText='display:block;background:rgba(34,197,94,0.1);color:#22C55E;border:1px solid #22C55E;padding:10px;border-radius:8px;font-size:0.82rem;margin-bottom:12px;';
+  result.textContent=t.msg_ok;
+  ['c-name','c-surname','c-email','c-phone','c-msg'].forEach(id=>document.getElementById(id).value='');
+}
+
+// ── HUDUDLAR BO'YICHA JS ─────────────────────────────────────
+const HUDUD_LIST = [
+  { value:"chilonzor",    key:"district_chilonzor",    emoji:"🏙️" },
+  { value:"yunusobod",    key:"district_yunusobod",    emoji:"🌿" },
+  { value:"mirzo",        key:"district_mirzo",        emoji:"🏛️" },
+  { value:"yakkasaroy",   key:"district_yakkasaroy",   emoji:"🏘️" },
+  { value:"shayxontohur", key:"district_shayxontohur", emoji:"⛪" },
+  { value:"olmazar",      key:"district_olmazar",      emoji:"🌳" },
+  { value:"uchtepa",      key:"district_uchtepa",      emoji:"🏗️" },
+  { value:"sergeli",      key:"district_sergeli",      emoji:"🌄" },
+  { value:"bektemir",     key:"district_bektemir",     emoji:"🏭" },
+  { value:"yashnobod",    key:"district_yashnobod",    emoji:"🌱" },
+  { value:"mirobod",      key:"district_mirobod",      emoji:"🏢" },
+  { value:"hamza",        key:"district_hamza",        emoji:"⚽" },
+];
+
+// Qo'shimcha i18n kalitlari
+const huduExtra = {
+  uz:{ hudud_label:"HUDUDLAR BO'YICHA", hudud_title:"O'zingizga yaqin hududni tanlang",
+       hudud_sub:"Toshkentdagi barcha tumanlar bo'yicha maydonlarni toping",
+       hudud_all:"Barcha hududlar", hudud_all_sub:"Barcha maydonlarni ko'rish",
+       hudud_clear:"✕ Filterni tozalash", hudud_fields:"ta maydon",
+       hudud_no:"hozircha yo'q" },
+  ru:{ hudud_label:"ПО РАЙОНАМ", hudud_title:"Выберите ближайший район",
+       hudud_sub:"Найдите поля во всех районах Ташкента",
+       hudud_all:"Все районы", hudud_all_sub:"Смотреть все поля",
+       hudud_clear:"✕ Сбросить фильтр", hudud_fields:"полей",
+       hudud_no:"пока нет" },
+  en:{ hudud_label:"BY DISTRICT", hudud_title:"Find your nearest district",
+       hudud_sub:"Find fields in all districts of Tashkent",
+       hudud_all:"All districts", hudud_all_sub:"View all fields",
+       hudud_clear:"✕ Clear filter", hudud_fields:"fields",
+       hudud_no:"none yet" },
+};
+Object.keys(huduExtra).forEach(lang => Object.assign(translations[lang], huduExtra[lang]));
+
+let huducActive = 'all';
+
+function renderHudud(fields) {
+  const grid = document.getElementById('hudud-grid');
+  if (!grid) return;
+  const t = translations[getLang()];
+  const countMap = {};
+  fields.forEach(f => { if(f.district) countMap[f.district]=(countMap[f.district]||0)+1; });
+
+  let html = `<a class="hudud-all-btn ${huducActive==='all'?'hc-active':''}" onclick="huducFilter('all')" href="#polyalar">
+    <div class="hc-icon" style="width:38px;height:38px;">🗺️</div>
+    <div class="hc-name">${t.hudud_all}</div>
+    <div class="hc-sub">${t.hudud_all_sub}</div>
+  </a>`;
+
+  HUDUD_LIST.forEach(d => {
+    const name = t[d.key]||d.value;
+    const cnt = countMap[d.value]||0;
+    html += `<a class="hudud-card ${huducActive===d.value?'hc-active':''}" onclick="huducFilter('${d.value}')" href="#polyalar">
+      <div class="hc-top">
+        <div class="hc-icon">${d.emoji}</div>
+        <span class="hc-count">${cnt}</span>
+      </div>
+      <div class="hc-name">${name}</div>
+      <div class="hc-sub">${cnt ? cnt+' '+t.hudud_fields : t.hudud_no}</div>
+    </a>`;
+  });
+  grid.innerHTML = html;
+}
+
+function huducFilter(district) {
+  huducActive = district;
+  const t = translations[getLang()];
+  const bar = document.getElementById('hudud-result');
+
+  if (district === 'all') {
+    bar.style.display = 'none';
+    currentDistrict = 'all';
+    renderFields(allFields);
+  } else {
+    const cnt = allFields.filter(f=>f.district===district).length;
+    const name = t['district_'+district]||district;
+    bar.style.display = 'flex';
+    document.getElementById('hrb-name').textContent = name;
+    document.getElementById('hrb-count').textContent = cnt+' '+t.hudud_fields;
+    currentDistrict = district;
+    renderFields(allFields.filter(f=>f.district===district));
+  }
+  if(allFields.length) renderHudud(allFields);
+}
+
+function huducClear() { huducFilter('all'); }
+
+loadFields();
+renderNav('nav-links');
+applyLang();
+</script>
+</body>
+</html>

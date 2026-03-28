@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bron Qilish — ManaPolya</title>
+<link rel="stylesheet" href="/static/css/style.css">
+<style>
+/* STEPS */
+.steps-bar {
+  display:flex;align-items:center;justify-content:center;
+  gap:0;margin-bottom:40px;
+}
+.step-item {
+  display:flex;align-items:center;gap:8px;
+}
+.step-circle {
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;font-weight:800;
+  border:2px solid #334155;background:#1e293b;color:#64748b;
+  transition:all 0.3s;flex-shrink:0;
+}
+.step-circle.active { border-color:#22C55E;background:#22C55E;color:#000; }
+.step-circle.done { border-color:#22C55E;background:transparent;color:#22C55E; }
+.step-label { font-size:0.78rem;color:#64748b;font-weight:600; }
+.step-label.active { color:#22C55E; }
+.step-line { width:48px;height:2px;background:#334155;margin:0 4px; }
+.step-line.done { background:#22C55E; }
+
+/* PAYMENT BOX */
+.payment-box {
+  background:#1e293b;border:1px solid #334155;border-radius:16px;
+  padding:28px;margin-top:24px;
+}
+.payment-amount {
+  text-align:center;padding:24px;
+  background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.2);
+  border-radius:12px;margin-bottom:24px;
+}
+.payment-amount .lbl { font-size:0.75rem;color:#64748b;letter-spacing:0.12em;margin-bottom:8px; }
+.payment-amount .amt { font-size:2.2rem;font-weight:800;color:#22C55E; }
+.payment-amount .sub { font-size:0.78rem;color:#64748b;margin-top:4px; }
+.pay-methods { display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px; }
+.pay-method {
+  background:#0f172a;border:2px solid #334155;border-radius:12px;
+  padding:16px;text-align:center;cursor:pointer;transition:all 0.2s;
+}
+.pay-method:hover { border-color:#22C55E; }
+.pay-method.selected { border-color:#22C55E;background:rgba(34,197,94,0.06); }
+.pay-method .pm-icon { font-size:1.8rem;margin-bottom:6px; }
+.pay-method .pm-name { font-size:0.82rem;font-weight:700; }
+.pay-method .pm-sub { font-size:0.7rem;color:#64748b;margin-top:2px; }
+.pay-info { font-size:0.78rem;color:#64748b;text-align:center;margin-bottom:16px;line-height:1.6; }
+
+/* SUCCESS */
+.success-box {
+  text-align:center;padding:40px 24px;
+}
+.success-icon {
+  width:80px;height:80px;border-radius:50%;
+  background:rgba(34,197,94,0.1);border:2px solid #22C55E;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;margin:0 auto 20px;
+}
+.success-box h3 { font-size:1.5rem;font-weight:800;color:#22C55E;margin-bottom:12px; }
+.success-box p { color:#94a3b8;line-height:1.7; }
+.booking-id {
+  display:inline-block;margin:16px 0;
+  background:#1e293b;border:1px solid #334155;
+  border-radius:8px;padding:8px 20px;
+  font-family:monospace;font-size:0.88rem;color:#22C55E;
+}
+.success-details {
+  background:#1e293b;border:1px solid #334155;border-radius:12px;
+  padding:16px;margin:16px 0;text-align:left;
+}
+.sd-row { display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #0f172a;font-size:0.85rem; }
+.sd-row:last-child { border-bottom:none; }
+.sd-row span:first-child { color:#64748b; }
+.sd-row span:last-child { font-weight:700; }
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" style="text-decoration:none;display:flex;align-items:center;gap:12px">
+    <img src="/static/images/logo.svg" alt="ManaPolya" height="48"
+      style="border-radius:50%;object-fit:cover;width:48px;height:48px;border:2px solid #22C55E;">
+    <span style="font-size:1.2rem;font-weight:800;color:#f1f5f9">Mana<span style="color:#22C55E">Polya</span></span>
+  </a>
+  <div class="nav-links"><a href="/">← Orqaga</a></div>
+</nav>
+
+<div class="booking-wrap">
+
+  <!-- STEPS BAR -->
+  <div class="steps-bar" id="steps-bar">
+    <div class="step-item">
+      <div class="step-circle active" id="sc1">1</div>
+      <span class="step-label active" id="sl1">Ma'lumotlar</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc2">2</div>
+      <span class="step-label" id="sl2">To'lov</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-circle" id="sc3">3</div>
+      <span class="step-label" id="sl3">Tasdiqlash</span>
+    </div>
+  </div>
+
+  <h2 id="field-title">Yuklanmoqda...</h2>
+  <p class="sub" id="field-price"></p>
+
+  <!-- BOSQICH 1: FORMA -->
+  <div id="step1">
+    <div class="form-group">
+      <label>ISMINGIZ</label>
+      <input type="text" id="inp-name" placeholder="Akbar Toshmatov">
+    </div>
+    <div class="form-group">
+      <label>TELEFON</label>
+      <input type="text" id="inp-phone" placeholder="+998901234567">
+    </div>
+    <div class="form-group">
+      <label>SANA</label>
+      <input type="date" id="inp-date">
+    </div>
+    <div class="form-group">
+      <label>BOSHLANISH VAQTI</label>
+      <select id="inp-start">
+        <option value="">-- Tanlang --</option>
+        <option>08:00</option><option>09:00</option><option>10:00</option>
+        <option>11:00</option><option>12:00</option><option>13:00</option>
+        <option>14:00</option><option>15:00</option><option>16:00</option>
+        <option>17:00</option><option>18:00</option><option>19:00</option>
+        <option>20:00</option><option>21:00</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>TUGASH VAQTI</label>
+      <select id="inp-end">
+        <option value="">-- Tanlang --</option>
+        <option>09:00</option><option>10:00</option><option>11:00</option>
+        <option>12:00</option><option>13:00</option><option>14:00</option>
+        <option>15:00</option><option>16:00</option><option>17:00</option>
+        <option>18:00</option><option>19:00</option><option>20:00</option>
+        <option>21:00</option><option>22:00</option>
+      </select>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary" id="summary" style="display:none">
+      <div class="sum-row"><span>Polya</span><span id="sum-field">—</span></div>
+      <div class="sum-row"><span>Vaqt</span><span id="sum-time">—</span></div>
+      <div class="sum-row"><span>Jami narx</span><span id="sum-price">—</span></div>
+      <div class="sum-row total"><span>50% oldindan to'lov</span><span id="sum-prepay" style="color:#22C55E">—</span></div>
+    </div>
+
+    <div id="error-msg" class="error-box" style="display:none"></div>
+    <button class="btn-bron" onclick="goToPayment()">Keyingi qadam →</button>
+  </div>
+
+  <!-- BOSQICH 2: TO'LOV -->
+  <div id="step2" style="display:none">
+    <div class="payment-box">
+      <div class="payment-amount">
+        <div class="lbl">50% OLDINDAN TO'LOV</div>
+        <div class="amt" id="pay-amount">—</div>
+        <div class="sub" id="pay-sub">Qolgan 50% maydon oldida to'lanadi</div>
+      </div>
+
+      <p style="font-size:0.82rem;color:#94a3b8;margin-bottom:16px;font-weight:600;">
+        TO'LOV USULINI TANLANG
+      </p>
+
+      <div class="pay-methods">
+        <div class="pay-method" id="pm-payme" onclick="selectMethod('payme')">
+          <div class="pm-icon">💳</div>
+          <div class="pm-name">Payme</div>
+          <div class="pm-sub">Karta orqali</div>
+        </div>
+        <div class="pay-method" id="pm-click" onclick="selectMethod('click')">
+          <div class="pm-icon">⚡</div>
+          <div class="pm-name">Click</div>
+          <div class="pm-sub">Tez to'lov</div>
+        </div>
+        <div class="pay-method" id="pm-cash" onclick="selectMethod('cash')">
+          <div class="pm-icon">💵</div>
+          <div class="pm-name">Naqd pul</div>
+          <div class="pm-sub">Maydon oldida</div>
+        </div>
+        <div class="pay-method" id="pm-transfer" onclick="selectMethod('transfer')">
+          <div class="pm-icon">🏦</div>
+          <div class="pm-name">Bank o'tkazmasi</div>
+          <div class="pm-sub">Hisobdan</div>
+        </div>
+      </div>
+
+      <div class="pay-info">
+        🔒 To'lovingiz xavfsiz. 24 soat oldin bekor qilsangiz — to'liq qaytariladi.
+      </div>
+
+      <div id="error-msg2" class="error-box" style="display:none"></div>
+      <button class="btn-bron" onclick="confirmPayment()">To'lovni Tasdiqlash ✓</button>
+      <button onclick="backToForm()" style="width:100%;margin-top:10px;background:transparent;border:1px solid #334155;color:#94a3b8;padding:12px;border-radius:10px;cursor:pointer;font-family:inherit;">← Orqaga</button>
+    </div>
+  </div>
+
+  <!-- BOSQICH 3: TASDIQLASH -->
+  <div id="step3" style="display:none">
+    <div class="success-box">
+      <div class="success-icon">🎉</div>
+      <h3>Bron Tasdiqlandi!</h3>
+      <p>Tabriklaymiz! Sizning broningiz muvaffaqiyatli qabul qilindi.</p>
+      <div class="booking-id" id="booking-id-box">Bron #—</div>
+
+      <div class="success-details" id="success-details"></div>
+
+      <p style="font-size:0.8rem;color:#64748b;margin-top:8px;">
+        📞 Savollar uchun: <strong style="color:#f1f5f9">+998 90 059 63 61</strong>
+      </p>
+      <a href="/" class="btn-bron" style="display:inline-block;margin-top:20px;text-decoration:none;">
+        ← Bosh sahifaga
+      </a>
+    </div>
+  </div>
+
+</div><!-- /booking-wrap -->
+
+<script>
+const fieldId = "{{ field_id }}";
+let fieldData = null;
+let selectedMethod = null;
+let bookingData = null;
+
+async function loadField() {
+  const res = await fetch('/api/fields/' + fieldId);
+  if (!res.ok) { document.getElementById('field-title').textContent = 'Polya topilmadi'; return; }
+  fieldData = await res.json();
+  document.getElementById('field-title').textContent = fieldData.name;
+  document.getElementById('field-price').textContent = fieldData.price_per_hour.toLocaleString() + ' so\'m / soat';
+  document.getElementById('inp-date').value = new Date().toISOString().split('T')[0];
+}
+
+function updateSummary() {
+  const start = document.getElementById('inp-start').value;
+  const end   = document.getElementById('inp-end').value;
+  const date  = document.getElementById('inp-date').value;
+  if (start && end && date && fieldData) {
+    const hours = parseInt(end) - parseInt(start);
+    if (hours > 0) {
+      const total   = fieldData.price_per_hour * hours;
+      const prepay  = total / 2;
+      document.getElementById('summary').style.display = 'block';
+      document.getElementById('sum-field').textContent  = fieldData.name;
+      document.getElementById('sum-time').textContent   = start + ' – ' + end + ' (' + hours + ' soat)';
+      document.getElementById('sum-price').textContent  = total.toLocaleString() + ' so\'m';
+      document.getElementById('sum-prepay').textContent = prepay.toLocaleString() + ' so\'m';
+    }
+  }
+}
+
+['inp-start','inp-end','inp-date'].forEach(id =>
+  document.getElementById(id).addEventListener('change', updateSummary)
+);
+
+// STEP 1 → STEP 2
+async function goToPayment() {
+  const name  = document.getElementById('inp-name').value.trim();
+  const phone = document.getElementById('inp-phone').value.trim();
+  const date  = document.getElementById('inp-date').value;
+  const start = document.getElementById('inp-start').value;
+  const end   = document.getElementById('inp-end').value;
+  const err   = document.getElementById('error-msg');
+
+  if (!name || !phone || !date || !start || !end) {
+    err.style.display='block'; err.textContent='⚠️ Barcha maydonlarni to\'ldiring!'; return;
+  }
+  if (parseInt(end) <= parseInt(start)) {
+    err.style.display='block'; err.textContent='⚠️ Tugash vaqti boshlanishdan keyin bo\'lishi kerak!'; return;
+  }
+  err.style.display='none';
+
+  // API ga yuborish
+  const res = await fetch('/api/bookings/', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      field_id:   fieldId,
+      user_name:  name,
+      user_phone: phone,
+      start_time: date + 'T' + start + ':00',
+      end_time:   date + 'T' + end   + ':00'
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    err.style.display='block'; err.textContent='❌ ' + (data.detail || 'Xatolik yuz berdi'); return;
+  }
+  bookingData = data;
+
+  // To'lov summasi
+  const hours  = parseInt(end) - parseInt(start);
+  const prepay = fieldData.price_per_hour * hours / 2;
+  document.getElementById('pay-amount').textContent = prepay.toLocaleString() + ' so\'m';
+
+  // Step 2 ga o'tish
+  setStep(2);
+}
+
+function selectMethod(method) {
+  selectedMethod = method;
+  ['payme','click','cash','transfer'].forEach(m => {
+    document.getElementById('pm-' + m).classList.toggle('selected', m === method);
+  });
+}
+
+// STEP 2 → STEP 3
+function confirmPayment() {
+  const err = document.getElementById('error-msg2');
+  if (!selectedMethod) {
+    err.style.display='block'; err.textContent='⚠️ To\'lov usulini tanlang!'; return;
+  }
+  err.style.display='none';
+
+  // Success details
+  const date  = document.getElementById('inp-date').value;
+  const start = document.getElementById('inp-start').value;
+  const end   = document.getElementById('inp-end').value;
+  const hours = parseInt(end) - parseInt(start);
+  const total  = fieldData.price_per_hour * hours;
+  const prepay = total / 2;
+  const methods = {payme:'Payme', click:'Click', cash:'Naqd pul', transfer:'Bank o\'tkazmasi'};
+
+  document.getElementById('booking-id-box').textContent = 'Bron #' + bookingData.id;
+  document.getElementById('success-details').innerHTML = `
+    <div class="sd-row"><span>Polya</span><span>${fieldData.name}</span></div>
+    <div class="sd-row"><span>Sana</span><span>${date}</span></div>
+    <div class="sd-row"><span>Vaqt</span><span>${start} – ${end}</span></div>
+    <div class="sd-row"><span>Jami narx</span><span>${total.toLocaleString()} so'm</span></div>
+    <div class="sd-row"><span>To'langan (50%)</span><span style="color:#22C55E">${prepay.toLocaleString()} so'm</span></div>
+    <div class="sd-row"><span>To'lov usuli</span><span>${methods[selectedMethod]}</span></div>
+    <div class="sd-row"><span>Holat</span><span style="color:#22C55E">✅ Tasdiqlandi</span></div>
+  `;
+
+  setStep(3);
+}
+
+function backToForm() { setStep(1); }
+
+function setStep(n) {
+  // Panellarni ko'rsat/yashir
+  document.getElementById('step1').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('step2').style.display = n===2 ? 'block' : 'none';
+  document.getElementById('step3').style.display = n===3 ? 'block' : 'none';
+
+  // Steps bar
+  for (let i=1; i<=3; i++) {
+    const sc = document.getElementById('sc'+i);
+    const sl = document.getElementById('sl'+i);
+    sc.className = 'step-circle' + (i < n ? ' done' : i === n ? ' active' : '');
+    sc.textContent = i < n ? '✓' : i;
+    sl.className = 'step-label' + (i === n ? ' active' : '');
+  }
+  document.getElementById('line1').className = 'step-line' + (n > 1 ? ' done' : '');
+  document.getElementById('line2').className = 'step-line' + (n > 2 ? ' done' : '');
+
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+loadField();
+</script>
+</body>
+</html>
