@@ -7,11 +7,15 @@ import os
 
 from routes import fields, bookings, admin
 
-Base.metadata.create_all(bind=engine)
-
 app = FastAPI(title="Mana Polya Bron Tizimi")
 
-# Vercel uchun to'liq yo'l
+@app.on_event("startup")
+async def startup():
+    try:
+        Base.metadata.create_all(bind=engine)
+    except Exception as e:
+        print(f"Database error: {e}")
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app.mount("/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static")
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
