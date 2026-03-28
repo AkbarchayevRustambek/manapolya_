@@ -1,4 +1,4 @@
-# Mini Polya Bron Tizimi
+# ManaPolya Bron Tizimi
 
 ## O'rnatish va Ishga Tushirish
 
